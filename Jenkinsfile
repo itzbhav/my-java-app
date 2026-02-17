@@ -19,14 +19,15 @@ pipeline {
                 script {
                     withSonarQubeEnv('My Sonar Server') {
                         sh '''
-                            # Setup Maven again in this stage
+                            # Setup Maven
                             export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
                             
-                            # Run SonarQube scan with Ubuntu host IP
+                            # Run SonarQube scan (token passed via withSonarQubeEnv)
                             mvn sonar:sonar \
                               -Dsonar.projectKey=my-java-app \
                               -Dsonar.projectName="My Java App" \
-                              -Dsonar.host.url=http://192.168.138.78:9000
+                              -Dsonar.host.url=http://192.168.138.78:9000 \
+                              -Dsonar.login=$SONAR_AUTH_TOKEN
                         '''
                     }
                 }
