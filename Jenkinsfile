@@ -1,20 +1,25 @@
 pipeline {
     agent any
-    
-    tools {
-        maven 'Maven'  // Jenkins will auto-install Maven
-    }
-    
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                sh '''
+                    wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+                    tar xzf apache-maven-3.9.6-bin.tar.gz
+                    export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
+                    mvn clean compile
+                '''
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('My Sonar Server') {
-                    sh 'mvn sonar:sonar'
+                    sh '''
+                        wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+                        tar xzf apache-maven-3.9.6-bin.tar.gz
+                        export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
+                        mvn sonar:sonar
+                    '''
                 }
             }
         }
