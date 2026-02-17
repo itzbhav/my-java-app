@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    tools {
+        maven 'Maven'  // Jenkins will auto-install Maven
+    }
+    
     stages {
         stage('Build') {
             steps {
