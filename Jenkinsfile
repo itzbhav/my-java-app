@@ -4,21 +4,19 @@ pipeline {
         stage('Maven Build & Sonar') {
             steps {
                 sh '''
-                    # Download Maven directly (no sudo needed)
-                    wget -q https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
-                    tar xzf apache-maven-3.9.6-bin.tar.gz
+                    # Use curl (exists in Jenkins Docker) instead of wget
+                    curl -sL https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz -o maven.tar.gz
+                    tar xzf maven.tar.gz
                     export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
                     
-                    # Verify
+                    # Verify Maven works
                     mvn --version
                     
-                    # Build
+                    # Clean compile
                     mvn clean compile
                     
-                    # SonarQube
-                    withSonarQubeEnv('My Sonar Server') {
-                        mvn sonar:sonar
-                    }
+                    # SonarQube scan
+                    mvn sonar:sonar -Dsonar.host.url=http://localhost:9000
                 '''
             }
         }
