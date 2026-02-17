@@ -1,25 +1,21 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Maven Build & Sonar') {
             steps {
                 sh '''
-                    # Install Maven in Docker container
-                    apt-get update
-                    apt-get install -y maven openjdk-17-jdk wget unzip
+                    # Download Maven directly (no sudo needed)
+                    wget -q https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+                    tar xzf apache-maven-3.9.6-bin.tar.gz
+                    export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
                     
-                    # Verify Maven
+                    # Verify
                     mvn --version
                     
                     # Build
                     mvn clean compile
                     
-                    # SonarQube analysis
+                    # SonarQube
                     withSonarQubeEnv('My Sonar Server') {
                         mvn sonar:sonar
                     }
