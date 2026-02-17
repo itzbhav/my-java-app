@@ -16,20 +16,16 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    withSonarQubeEnv('My Sonar Server') {
-                        sh '''
-                            # Setup Maven
-                            export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
-                            
-                            # Run SonarQube scan (token passed via withSonarQubeEnv)
-                            mvn sonar:sonar \
-                              -Dsonar.projectKey=my-java-app \
-                              -Dsonar.projectName="My Java App" \
-                              -Dsonar.host.url=http://192.168.138.78:9000 \
-                              -Dsonar.login=$SONAR_AUTH_TOKEN
-                        '''
-                    }
+                withSonarQubeEnv('My Sonar Server') {
+                    sh '''
+                        # Setup Maven
+                        export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
+                        
+                        # Run SonarQube scan (withSonarQubeEnv sets SONAR_HOST_URL and SONAR_AUTH_TOKEN)
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=my-java-app \
+                          -Dsonar.projectName="My Java App"
+                    '''
                 }
             }
         }
