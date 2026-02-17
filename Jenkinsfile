@@ -1,26 +1,29 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh '''
-                    wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
-                    tar xzf apache-maven-3.9.6-bin.tar.gz
-                    export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
-                    mvn clean compile
-                '''
+                checkout scm
             }
         }
-        stage('SonarQube Analysis') {
+        stage('Maven Build & Sonar') {
             steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh '''
-                        wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
-                        tar xzf apache-maven-3.9.6-bin.tar.gz
-                        export PATH=$PWD/apache-maven-3.9.6/bin:$PATH
+                sh '''
+                    # Install Maven in Docker container
+                    apt-get update
+                    apt-get install -y maven openjdk-17-jdk wget unzip
+                    
+                    # Verify Maven
+                    mvn --version
+                    
+                    # Build
+                    mvn clean compile
+                    
+                    # SonarQube analysis
+                    withSonarQubeEnv('My Sonar Server') {
                         mvn sonar:sonar
-                    '''
-                }
+                    }
+                '''
             }
         }
     }
